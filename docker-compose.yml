@@ -1,0 +1,42 @@
+version: "3.8"
+name: demo-webapps-micro-services
+
+services:
+    db:
+        container_name: db-mysql
+        build:  ./db
+        volumes:
+            - ./databaseVolume:/var/lib/mysql
+            #- db_volumes:/var/lib/mysql
+        environment:
+            - MYSQL_ROOT_PASSWORD=root
+            - MYSQL_PASSWORD=root
+            - MYSQL_USER=evengyl
+            - MYSQL_DATABASE=demo_tf_webapps_23
+        restart: always
+
+    api:
+        container_name: api-express
+        build: ./api
+        environment:
+            - API_MYSQL_HOST=db
+            - API_MYSQL_USER=evengyl
+            - API_MYSQL_PASSWORD=root
+            - API_MYSQL_DATABASE=demo_tf_webapps_23
+            - PORT=3000
+        restart: on-failure
+        depends_on:
+            - db
+        ports:
+            - 3000:3000
+
+#volumes:
+ #   db_volumes:
+
+#networks:
+
+
+#Build de DB dockerfile -> docker build --pull --rm -f "db\Dockerfile" -t db:latest "db"
+#Build de API dockerfile -> docker build --pull --rm -f "api\Dockerfile" -t api:latest "api"
+
+# docker compose -f "docker-compose.yml" up -d --build 
